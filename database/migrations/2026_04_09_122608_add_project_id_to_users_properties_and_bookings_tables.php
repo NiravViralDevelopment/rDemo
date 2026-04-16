@@ -14,14 +14,6 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->foreignId('project_id')->nullable()->after('id')->constrained('projects')->nullOnDelete();
         });
-
-        Schema::table('properties', function (Blueprint $table) {
-            $table->foreignId('project_id')->nullable()->after('id')->constrained('projects')->nullOnDelete();
-        });
-
-        Schema::table('bookings', function (Blueprint $table) {
-            $table->foreignId('project_id')->nullable()->after('id')->constrained('projects')->nullOnDelete();
-        });
     }
 
     /**
@@ -29,14 +21,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('bookings', function (Blueprint $table) {
-            $table->dropConstrainedForeignId('project_id');
-        });
-
-        Schema::table('properties', function (Blueprint $table) {
-            $table->dropConstrainedForeignId('project_id');
-        });
-
         Schema::table('users', function (Blueprint $table) {
             $table->dropConstrainedForeignId('project_id');
         });

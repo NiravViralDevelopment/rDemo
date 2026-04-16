@@ -30,17 +30,6 @@
                                 </select>
                             </div>
 
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Auto Create Houses</label>
-                                    <input type="number" min="0" name="house_count" class="form-control" value="{{ old('house_count', 0) }}">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Auto Create Shops</label>
-                                    <input type="number" min="0" name="shop_count" class="form-control" value="{{ old('shop_count', 0) }}">
-                                </div>
-                            </div>
-
                             <button type="submit" class="btn btn-sm comnBtn">Save Project</button>
                             <a href="{{ route('projects.index') }}" class="btn btn-sm btn-secondary">Back</a>
                         </form>

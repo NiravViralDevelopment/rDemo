@@ -45,7 +45,7 @@ class RoleController extends Controller
      */
     public function create(): View
     {
-        $permission = Permission::get();
+        $permission = Permission::query()->orderBy('name')->get();
         return view('roles.create',compact('permission'));
     }
     
@@ -98,7 +98,7 @@ class RoleController extends Controller
     public function edit($id): View
     {
         $role = Role::find($id);
-        $permission = Permission::get();
+        $permission = Permission::query()->orderBy('name')->get();
         $rolePermissions = DB::table("role_has_permissions")->where("role_has_permissions.role_id",$id)
             ->pluck('role_has_permissions.permission_id','role_has_permissions.permission_id')
             ->all();

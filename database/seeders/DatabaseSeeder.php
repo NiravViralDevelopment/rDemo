@@ -15,7 +15,6 @@ class DatabaseSeeder extends Seeder
             PermissionTableSeeder::class,
             CreateAdminUserSeeder::class,
             ContactsSeeder::class,
-            HousingDemoSeeder::class,
         ]);
     }
 }

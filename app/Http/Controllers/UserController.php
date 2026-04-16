@@ -13,11 +13,9 @@ use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 use App\Mail\UserCreatedMail;
 use App\Models\Project;
-use App\Models\Property;
 use Illuminate\Support\Facades\Hash as FacadesHash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\ValidationException;
     
 class UserController extends Controller
 {
@@ -33,25 +31,6 @@ class UserController extends Controller
             ->when(! empty($authUser->project_id), fn ($q) => $q->where('project_id', $authUser->project_id))
             ->latest()
             ->get();
-
-        $projectIds = $data->pluck('project_id')->filter()->unique()->values();
-        $propertyCounts = Property::query()
-            ->selectRaw('project_id, type, COUNT(*) as total')
-            ->whereIn('project_id', $projectIds)
-            ->groupBy('project_id', 'type')
-            ->get();
-
-        $countsMap = [];
-        foreach ($propertyCounts as $row) {
-            $countsMap[$row->project_id][$row->type] = (int) $row->total;
-        }
-
-        $data->transform(function ($user) use ($countsMap) {
-            $projectId = $user->project_id;
-            $user->house_count = $projectId ? (int) ($countsMap[$projectId]['house'] ?? 0) : 0;
-            $user->shop_count = $projectId ? (int) ($countsMap[$projectId]['shop'] ?? 0) : 0;
-            return $user;
-        });
 
         return view('users.index',compact('data'))
             ->with('i', ($request->input('page', 1) - 1) * 5);
@@ -83,8 +62,6 @@ class UserController extends Controller
             'email' => 'required|email|unique:users,email',
             'password' => 'required|same:confirm-password',
             'roles' => 'required',
-            'total_houses' => 'nullable|integer|min:0',
-            'total_shops' => 'nullable|integer|min:0',
         ]);
        
         $input = $request->all();
@@ -95,7 +72,6 @@ class UserController extends Controller
         $input['password'] = FacadesHash::make($input['password']);
         $user = User::create($input);
         $user->assignRole($request->input('roles'));
-        $this->syncProjectInventoryFromRequest($request, $input['project_id']);
         // Mail::to($user->email)->send(new UserCreatedMail($user));
         return redirect()->route('users.index')
                         ->with('message','User created successfully and email sent');
@@ -131,14 +107,8 @@ class UserController extends Controller
         }
         $roles = Role::pluck('name','name')->all();
         $userRole = $user->roles->pluck('name','name')->all();
-        $currentTotalHouses = $user->project_id
-            ? Property::query()->where('project_id', $user->project_id)->where('type', 'house')->count()
-            : 0;
-        $currentTotalShops = $user->project_id
-            ? Property::query()->where('project_id', $user->project_id)->where('type', 'shop')->count()
-            : 0;
-    
-        return view('users.edit', compact('user', 'roles', 'userRole', 'currentTotalHouses', 'currentTotalShops'));
+
+        return view('users.edit', compact('user', 'roles', 'userRole'));
     }
     
     /**
@@ -155,8 +125,6 @@ class UserController extends Controller
             'email' => 'required|email|unique:users,email,'.$id,
             'password' => 'same:confirm-password',
             'roles' => 'required',
-            'total_houses' => 'nullable|integer|min:0',
-            'total_shops' => 'nullable|integer|min:0',
         ]);
     
         $input = $request->all();
@@ -180,7 +148,6 @@ class UserController extends Controller
         DB::table('model_has_roles')->where('model_id',$id)->delete();
     
         $user->assignRole($request->input('roles'));
-        $this->syncProjectInventoryFromRequest($request, $input['project_id']);
     
         return redirect()->route('users.index')
                         ->with('message','User updated successfully');
@@ -225,65 +192,5 @@ class UserController extends Controller
         );
 
         return (int) $project->id;
-    }
-
-    private function syncProjectInventoryFromRequest(Request $request, ?int $projectId): void
-    {
-        $roles = (array) $request->input('roles', []);
-        if (! in_array('Project User', $roles, true) || ! $projectId) {
-            return;
-        }
-
-        $desiredHouses = (int) ($request->input('total_houses') ?? 0);
-        $desiredShops = (int) ($request->input('total_shops') ?? 0);
-
-        $this->ensurePropertyCount($projectId, 'house', $desiredHouses);
-        $this->ensurePropertyCount($projectId, 'shop', $desiredShops);
-    }
-
-    private function ensurePropertyCount(int $projectId, string $type, int $desiredTotal): void
-    {
-        if ($desiredTotal <= 0) {
-            return;
-        }
-
-        $current = Property::query()
-            ->where('project_id', $projectId)
-            ->where('type', $type)
-            ->count();
-
-        if ($current >= $desiredTotal) {
-            return;
-        }
-
-        $projectCode = (string) Project::query()->whereKey($projectId)->value('code');
-        if ($projectCode === '') {
-            throw ValidationException::withMessages(['name' => 'Project code not found for selected project user.']);
-        }
-
-        $prefix = $type === 'house' ? 'H' : 'S';
-        $titleBase = $type === 'house' ? 'House' : 'Shop';
-        $now = now();
-        $rows = [];
-
-        for ($i = $current + 1; $i <= $desiredTotal; $i++) {
-            $rows[] = [
-                'project_id' => $projectId,
-                'code' => sprintf('%s-%s-%04d', $projectCode, $prefix, $i),
-                'type' => $type,
-                'title' => $titleBase . ' ' . $i,
-                'city' => null,
-                'address' => null,
-                'bedrooms' => $type === 'house' ? 2 : null,
-                'area_sqft' => $type === 'house' ? 900 : 350,
-                'price_per_day' => 0,
-                'status' => 'available',
-                'description' => null,
-                'created_at' => $now,
-                'updated_at' => $now,
-            ];
-        }
-
-        Property::query()->insert($rows);
     }
 }

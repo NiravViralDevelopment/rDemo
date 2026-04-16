@@ -22,6 +22,14 @@
                 <span>Roles</span>
             </a>
         </li>
+        @can('permission-list')
+        <li class="nav-item {{ in_array(Route::currentRouteName(), ['permissions.index', 'permissions.edit', 'permissions.create']) ? 'active' : '' }}">
+            <a class="nav-link" href="{{ route('permissions.index') }}">
+                <i class="bi bi-key sidebar-nav-icon" aria-hidden="true"></i>
+                <span>Permissions</span>
+            </a>
+        </li>
+        @endcan
         @endif
         @endcan  
         @can('user-list')
@@ -36,49 +44,6 @@
         @endcan
 
          
-
-        <li class="nav-item {{ in_array(Route::currentRouteName(), ['houses.index', 'shops.index']) ? 'active' : '' }}">
-            <a class="nav-link" href="{{ route('houses.index') }}">
-                <i class="bi bi-house-door sidebar-nav-icon" aria-hidden="true"></i>
-                <span>House List</span>
-            </a>
-        </li>
-
-        <li class="nav-item {{ in_array(Route::currentRouteName(), ['partners.index', 'partners.create', 'partners.edit']) ? 'active' : '' }}">
-            <a class="nav-link" href="{{ route('partners.index') }}">
-                <i class="bi bi-person-vcard sidebar-nav-icon" aria-hidden="true"></i>
-                <span>Partners</span>
-            </a>
-        </li>
-
-        <li class="nav-item {{ in_array(Route::currentRouteName(), ['vendors.index', 'vendors.create', 'vendors.edit']) ? 'active' : '' }}">
-            <a class="nav-link" href="{{ route('vendors.index') }}">
-                <i class="bi bi-truck sidebar-nav-icon" aria-hidden="true"></i>
-                <span>Vendors</span>
-            </a>
-        </li>
-
-        <li class="nav-item {{ in_array(Route::currentRouteName(), ['shops.index']) ? 'active' : '' }}">
-            <a class="nav-link" href="{{ route('shops.index') }}">
-                <i class="bi bi-shop sidebar-nav-icon" aria-hidden="true"></i>
-                <span>Shop List</span>
-            </a>
-        </li>
-
-        <li class="nav-item {{ in_array(Route::currentRouteName(), ['bookings.index']) ? 'active' : '' }}">
-            <a class="nav-link" href="{{ route('bookings.index') }}">
-                <i class="bi bi-calendar-check sidebar-nav-icon" aria-hidden="true"></i>
-                <span>Bookings</span>
-            </a>
-        </li>
-
-        <li class="nav-item {{ in_array(Route::currentRouteName(), ['banks.index', 'banks.create', 'banks.edit']) ? 'active' : '' }}">
-            <a class="nav-link" href="{{ route('banks.index') }}">
-                <i class="bi bi-bank sidebar-nav-icon" aria-hidden="true"></i>
-                <span>Banks</span>
-            </a>
-        </li>
-            
     </ul>
   </aside>
   

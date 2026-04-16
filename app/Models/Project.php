@@ -20,14 +20,4 @@ class Project extends Model
     {
         return $this->hasMany(User::class);
     }
-
-    public function properties(): HasMany
-    {
-        return $this->hasMany(Property::class);
-    }
-
-    public function bookings(): HasMany
-    {
-        return $this->hasMany(Booking::class);
-    }
 }

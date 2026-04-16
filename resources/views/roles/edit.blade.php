@@ -44,7 +44,7 @@
             <div class="form-group flxfrmGp minGp mbZero">
                 <strong class="strng">Permission:</strong>
                 <br/>
-                <div class="flxLbl">
+                <div class="flxLbl" style="max-height: 320px; overflow-y: auto;">
                 @foreach($permission as $value)
                     <label><input type="checkbox" name="permission[{{$value->id}}]" value="{{$value->id}}" class="name" {{ in_array($value->id, $rolePermissions) ? 'checked' : ''}}>
                     {{ $value->name }}</label>

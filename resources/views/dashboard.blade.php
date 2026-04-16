@@ -124,9 +124,6 @@
         }
     </style>
     <section class="section dashboard">
-        @php
-            $isProjectUser = !empty($user->project_id);
-        @endphp
         <div class="row">
             <div class="col-lg-12">
                 <div class="row diffBxRw g-3">
@@ -137,40 +134,14 @@
                         </div>
                     </div>
 
-                    @unless($isProjectUser)
-                        <div class="col-md-4 col-sm-6">
-                            <div class="card kpi-card">
-                                <div class="kpi-body">
-                                    <div>
-                                        <p class="kpi-label">Users</p>
-                                        <h3 class="kpi-value">{{ $totalUsers }}</h3>
-                                    </div>
-                                    <span class="kpi-icon bg-indigo">U</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4 col-sm-6">
-                            <div class="card kpi-card">
-                                <div class="kpi-body">
-                                    <div>
-                                        <p class="kpi-label">Roles</p>
-                                        <h3 class="kpi-value">{{ $totalRoles }}</h3>
-                                    </div>
-                                    <span class="kpi-icon bg-emerald">R</span>
-                                </div>
-                            </div>
-                        </div>
-                    @endunless
-
                     <div class="col-md-4 col-sm-6">
                         <div class="card kpi-card">
                             <div class="kpi-body">
                                 <div>
-                                    <p class="kpi-label">Houses</p>
-                                    <h3 class="kpi-value">{{ $totalHouses }}</h3>
+                                    <p class="kpi-label">Users</p>
+                                    <h3 class="kpi-value">{{ $totalUsers }}</h3>
                                 </div>
-                                <span class="kpi-icon bg-amber">H</span>
+                                <span class="kpi-icon bg-indigo">U</span>
                             </div>
                         </div>
                     </div>
@@ -179,51 +150,23 @@
                         <div class="card kpi-card">
                             <div class="kpi-body">
                                 <div>
-                                    <p class="kpi-label">Shops</p>
-                                    <h3 class="kpi-value">{{ $totalShops }}</h3>
+                                    <p class="kpi-label">Roles</p>
+                                    <h3 class="kpi-value">{{ $totalRoles }}</h3>
                                 </div>
-                                <span class="kpi-icon bg-sky">S</span>
+                                <span class="kpi-icon bg-emerald">R</span>
                             </div>
                         </div>
                     </div>
-
-                    <div class="col-md-4 col-sm-6">
-                        <div class="card kpi-card">
-                            <div class="kpi-body">
-                                <div>
-                                    <p class="kpi-label">Bookings</p>
-                                    <h3 class="kpi-value">{{ $totalBookings }}</h3>
-                                </div>
-                                <span class="kpi-icon bg-violet">B</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    @unless($isProjectUser)
-                        <div class="col-md-4 col-sm-6">
-                            <div class="card kpi-card">
-                                <div class="kpi-body">
-                                    <div>
-                                        <p class="kpi-label">Total Properties</p>
-                                        <h3 class="kpi-value">{{ $totalHouses + $totalShops }}</h3>
-                                    </div>
-                                    <span class="kpi-icon bg-rose">P</span>
-                                </div>
-                            </div>
-                        </div>
-                    @endunless
 
                     <div class="col-lg-6">
                         <div class="card erp-chart-card">
                             <div class="erp-chart-head">
-                                <h5 class="erp-chart-title">Core Metrics Overview</h5>
-                                <p class="erp-chart-subtitle">
-                                    {{ $isProjectUser ? 'Compare house, shop and booking volume' : 'Compare user, role and booking volume' }}
-                                </p>
+                                <h5 class="erp-chart-title">Role Distribution</h5>
+                                <p class="erp-chart-subtitle">User count per role</p>
                             </div>
                             <div class="erp-chart-wrap">
                                 <div class="chart-sm">
-                                    <canvas id="metricsBarChart"></canvas>
+                                    <canvas id="rolesBarChart"></canvas>
                                 </div>
                             </div>
                         </div>
@@ -232,12 +175,12 @@
                     <div class="col-lg-6">
                         <div class="card erp-chart-card">
                             <div class="erp-chart-head">
-                                <h5 class="erp-chart-title">Property Split</h5>
-                                <p class="erp-chart-subtitle">Houses vs shops distribution</p>
+                                <h5 class="erp-chart-title">Account Summary</h5>
+                                <p class="erp-chart-subtitle">High-level user and role counts</p>
                             </div>
                             <div class="erp-chart-wrap">
                                 <div class="chart-sm">
-                                    <canvas id="propertyDonutChart"></canvas>
+                                    <canvas id="summaryDonutChart"></canvas>
                                 </div>
                             </div>
                         </div>
@@ -257,24 +200,17 @@
             ];
             const chartGridColor = '#e2e8f0';
 
-            const metricsBarCanvas = document.getElementById('metricsBarChart');
-            const isProjectUser = @json($isProjectUser);
-            if (metricsBarCanvas) {
-                new Chart(metricsBarCanvas, {
+            const rolesBarCanvas = document.getElementById('rolesBarChart');
+            if (rolesBarCanvas) {
+                new Chart(rolesBarCanvas, {
                     type: 'bar',
                     data: {
-                        labels: isProjectUser ? ['Houses', 'Shops', 'Bookings'] : ['Users', 'Roles', 'Bookings'],
+                        labels: @json($roleLabels),
                         datasets: [{
                             label: 'Count',
-                            data: isProjectUser
-                                ? [{{ (int) $totalHouses }}, {{ (int) $totalShops }}, {{ (int) $totalBookings }}]
-                                : [{{ (int) $totalUsers }}, {{ (int) $totalRoles }}, {{ (int) $totalBookings }}],
-                            backgroundColor: isProjectUser
-                                ? [dashboardPalette[2], dashboardPalette[3], dashboardPalette[4]]
-                                : [dashboardPalette[0], dashboardPalette[1], dashboardPalette[4]],
-                            borderColor: isProjectUser
-                                ? [dashboardPalette[2], dashboardPalette[3], dashboardPalette[4]]
-                                : [dashboardPalette[0], dashboardPalette[1], dashboardPalette[4]],
+                            data: @json($roleUserCounts),
+                            backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#0ea5e9', '#8b5cf6', '#ef4444'],
+                            borderColor: ['#4f46e5', '#10b981', '#f59e0b', '#0ea5e9', '#8b5cf6', '#ef4444'],
                             borderWidth: 1.2,
                             borderRadius: 6
                         }]
@@ -307,15 +243,15 @@
                 });
             }
 
-            const propertyDonutCanvas = document.getElementById('propertyDonutChart');
-            if (propertyDonutCanvas) {
-                new Chart(propertyDonutCanvas, {
+            const summaryDonutCanvas = document.getElementById('summaryDonutChart');
+            if (summaryDonutCanvas) {
+                new Chart(summaryDonutCanvas, {
                     type: 'doughnut',
                     data: {
-                        labels: ['Houses', 'Shops'],
+                        labels: ['Users', 'Roles'],
                         datasets: [{
-                            data: [{{ (int) $totalHouses }}, {{ (int) $totalShops }}],
-                            backgroundColor: [dashboardPalette[2], dashboardPalette[3]],
+                            data: [{{ (int) $totalUsers }}, {{ (int) $totalRoles }}],
+                            backgroundColor: [dashboardPalette[0], dashboardPalette[1]],
                             borderWidth: 2,
                             borderColor: '#ffffff'
                         }]

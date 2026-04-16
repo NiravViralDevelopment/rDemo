@@ -71,20 +71,6 @@
                 </select>
             </div>
         </div>
-        <div class="col-xs-12 col-sm-12 col-md-6">
-            <div class="form-group">
-                <strong class="strng">Total Houses:</strong>
-                <input type="number" min="0" name="total_houses" class="form-control"
-                       value="{{ old('total_houses', $currentTotalHouses ?? 0) }}">
-            </div>
-        </div>
-        <div class="col-xs-12 col-sm-12 col-md-6">
-            <div class="form-group">
-                <strong class="strng">Total Shops:</strong>
-                <input type="number" min="0" name="total_shops" class="form-control"
-                       value="{{ old('total_shops', $currentTotalShops ?? 0) }}">
-            </div>
-        </div>
         <div class="col-xs-12 col-sm-12 col-md-12 mt50">
             <button type="submit" class="btn btn-sm comnBtn whtTxt"><i class="fa-solid fa-floppy-disk"></i> Submit</button>
         </div>

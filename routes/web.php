@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\OrderItemController;
 use App\Http\Controllers\ManageOrderController;
+use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProductController;
@@ -14,13 +15,6 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SignaturePDFController;
 use App\Http\Controllers\DummyDataController;
 use App\Http\Controllers\RawDataImportController;
-use App\Http\Controllers\PropertyController;
-use App\Http\Controllers\BookingController;
-use App\Http\Controllers\BookingPaymentController;
-use App\Http\Controllers\BankController;
-use App\Http\Controllers\BankTransactionController;
-use App\Http\Controllers\PartnerController;
-use App\Http\Controllers\VendorController;
 
 use Illuminate\Support\Facades\Auth;
 
@@ -57,6 +51,7 @@ Route::group(['middleware' => ['auth']], function() {
 
     
     Route::resource('roles', RoleController::class);
+    Route::resource('permissions', PermissionController::class)->except(['show']);
     Route::resource('users', UserController::class);
    
     
@@ -82,77 +77,6 @@ Route::group(['middleware' => ['auth']], function() {
     Route::post('/raw-data-import/{id}/apply-rules-b2c', [RawDataImportController::class, 'applyRulesB2c'])->name('raw-data-import.apply-rules-b2c');
     Route::get('/raw-data-import/{id}/download', [RawDataImportController::class, 'downloadWorkingData'])->name('raw-data-import.download');
     Route::post('/raw-data-import/{id}/delete', [RawDataImportController::class, 'destroy'])->name('raw-data-import.destroy');
-
-    // Housing / Shop Booking module
-    Route::get('/partners', [PartnerController::class, 'index'])->name('partners.index');
-    Route::get('/partners/data', [PartnerController::class, 'data'])->name('partners.data');
-    Route::get('/partners/create', [PartnerController::class, 'create'])->name('partners.create');
-    Route::post('/partners', [PartnerController::class, 'store'])->name('partners.store');
-    Route::get('/partners/{id}/payments/create', [PartnerController::class, 'createPayment'])->name('partners.payments.create');
-    Route::post('/partners/{id}/payments', [PartnerController::class, 'storePayment'])->name('partners.payments.store');
-    Route::get('/partners/{id}/edit', [PartnerController::class, 'edit'])->name('partners.edit');
-    Route::put('/partners/{id}', [PartnerController::class, 'update'])->name('partners.update');
-    Route::delete('/partners/{id}', [PartnerController::class, 'destroy'])->name('partners.destroy');
-
-    Route::get('/vendors', [VendorController::class, 'index'])->name('vendors.index');
-    Route::get('/vendors/data', [VendorController::class, 'data'])->name('vendors.data');
-    Route::get('/vendors/create', [VendorController::class, 'create'])->name('vendors.create');
-    Route::post('/vendors', [VendorController::class, 'store'])->name('vendors.store');
-    Route::get('/vendors/{id}/transactions/create', [VendorController::class, 'createTransaction'])->name('vendors.transactions.create');
-    Route::post('/vendors/{id}/transactions', [VendorController::class, 'storeTransaction'])->name('vendors.transactions.store');
-    Route::get('/vendors/{id}/materials', [VendorController::class, 'materialsIndex'])->name('vendors.materials.index');
-    Route::get('/vendors/{id}/materials/data', [VendorController::class, 'materialsData'])->name('vendors.materials.data');
-    Route::post('/vendors/{id}/materials', [VendorController::class, 'materialsStore'])->name('vendors.materials.store');
-    Route::get('/vendors/{vendorId}/materials/{materialId}/edit', [VendorController::class, 'materialsEdit'])->name('vendors.materials.edit');
-    Route::put('/vendors/{vendorId}/materials/{materialId}', [VendorController::class, 'materialsUpdate'])->name('vendors.materials.update');
-    Route::delete('/vendors/{vendorId}/materials/{materialId}', [VendorController::class, 'materialsDestroy'])->name('vendors.materials.destroy');
-    Route::get('/vendors/{id}/edit', [VendorController::class, 'edit'])->name('vendors.edit');
-    Route::put('/vendors/{id}', [VendorController::class, 'update'])->name('vendors.update');
-    Route::delete('/vendors/{id}', [VendorController::class, 'destroy'])->name('vendors.destroy');
-
-    Route::get('/properties', [PropertyController::class, 'index'])->name('properties.index');
-    Route::get('/properties/data', [PropertyController::class, 'data'])->name('properties.data');
-    Route::get('/houses', [PropertyController::class, 'houses'])->name('houses.index');
-    Route::get('/houses/data', [PropertyController::class, 'housesData'])->name('houses.data');
-    Route::get('/shops', [PropertyController::class, 'shops'])->name('shops.index');
-    Route::get('/shops/data', [PropertyController::class, 'shopsData'])->name('shops.data');
-    Route::get('/properties/create', [PropertyController::class, 'create'])->name('properties.create');
-    Route::post('/properties', [PropertyController::class, 'store'])->name('properties.store');
-    Route::get('/properties/{id}/edit', [PropertyController::class, 'edit'])->name('properties.edit');
-    Route::put('/properties/{id}', [PropertyController::class, 'update'])->name('properties.update');
-    Route::delete('/properties/{id}', [PropertyController::class, 'destroy'])->name('properties.destroy');
-    Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
-    Route::get('/bookings/data', [BookingController::class, 'data'])->name('bookings.data');
-    Route::get('/bookings/create', [BookingController::class, 'create'])->name('bookings.create');
-    Route::get('/bookings/{id}', [BookingController::class, 'show'])->name('bookings.show');
-    Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store');
-    Route::get('/bookings/{id}/edit', [BookingController::class, 'edit'])->name('bookings.edit');
-    Route::put('/bookings/{id}', [BookingController::class, 'update'])->name('bookings.update');
-    Route::delete('/bookings/{id}', [BookingController::class, 'destroy'])->name('bookings.destroy');
-    Route::get('/bookings/{bookingId}/payments', [BookingPaymentController::class, 'index'])->name('bookings.payments.index');
-    Route::get('/bookings/{bookingId}/payments/data', [BookingPaymentController::class, 'data'])->name('bookings.payments.data');
-    Route::get('/bookings/{bookingId}/payments/create', [BookingPaymentController::class, 'create'])->name('bookings.payments.create');
-    Route::post('/bookings/{bookingId}/payments', [BookingPaymentController::class, 'store'])->name('bookings.payments.store');
-    Route::get('/bookings/{bookingId}/payments/{paymentId}/edit', [BookingPaymentController::class, 'edit'])->name('bookings.payments.edit');
-    Route::put('/bookings/{bookingId}/payments/{paymentId}', [BookingPaymentController::class, 'update'])->name('bookings.payments.update');
-    Route::delete('/bookings/{bookingId}/payments/{paymentId}', [BookingPaymentController::class, 'destroy'])->name('bookings.payments.destroy');
-    Route::get('/banks', [BankController::class, 'index'])->name('banks.index');
-    Route::get('/banks/data', [BankController::class, 'data'])->name('banks.data');
-    Route::get('/banks/create', [BankController::class, 'create'])->name('banks.create');
-    Route::post('/banks', [BankController::class, 'store'])->name('banks.store');
-    Route::get('/banks/{id}/edit', [BankController::class, 'edit'])->name('banks.edit');
-    Route::put('/banks/{id}', [BankController::class, 'update'])->name('banks.update');
-    Route::delete('/banks/{id}', [BankController::class, 'destroy'])->name('banks.destroy');
-    Route::get('/banks/{bankId}/transactions', [BankTransactionController::class, 'index'])->name('banks.transactions.index');
-    Route::get('/banks/{bankId}/transactions/data', [BankTransactionController::class, 'data'])->name('banks.transactions.data');
-    Route::get('/banks/{bankId}/transactions/create', [BankTransactionController::class, 'create'])->name('banks.transactions.create');
-    Route::post('/banks/{bankId}/transactions', [BankTransactionController::class, 'store'])->name('banks.transactions.store');
-    Route::get('/banks/{bankId}/transactions/{transactionId}/edit', [BankTransactionController::class, 'edit'])->name('banks.transactions.edit');
-    Route::put('/banks/{bankId}/transactions/{transactionId}', [BankTransactionController::class, 'update'])->name('banks.transactions.update');
-    Route::delete('/banks/{bankId}/transactions/{transactionId}', [BankTransactionController::class, 'destroy'])->name('banks.transactions.destroy');
-    
-   
-    
 
 });
 

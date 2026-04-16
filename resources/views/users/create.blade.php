@@ -80,18 +80,6 @@
                         </select>
                     </div>
                 </div><br>
-                <div class="col-xs-12 col-sm-12 col-md-6">
-                    <div class="form-group">
-                        <strong class="strng">Total Houses:</strong>
-                        <input type="number" min="0" name="total_houses" placeholder="e.g. 25" class="form-control" value="{{ old('total_houses', 0) }}">
-                    </div>
-                </div>
-                <div class="col-xs-12 col-sm-12 col-md-6">
-                    <div class="form-group">
-                        <strong class="strng">Total Shops:</strong>
-                        <input type="number" min="0" name="total_shops" placeholder="e.g. 24" class="form-control" value="{{ old('total_shops', 0) }}">
-                    </div>
-                </div>
                 <div class="col-xs-12 col-sm-12 col-md-12 mt50">
                     <button type="submit" class="btn btn-sm comnBtn"><i class="fa-solid fa-floppy-disk"></i> Submit</button>
                 </div>

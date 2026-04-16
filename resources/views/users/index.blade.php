@@ -237,8 +237,6 @@
                     <th>No</th>
                     <th>Project</th>
                     <th>Email</th>
-                    <th>Houses</th>
-                    <th>Shops</th>
                     <th>Roles</th>
                     <th width="280px">Action</th>
                 </tr>
@@ -249,8 +247,6 @@
                             <td><span class="mobileShow">No. :</span> {{ ++$i }}</td>
                             <td><span class="mobileShow">Project :</span> {{ $user->project?->name ?? 'GLOBAL' }}</td>
                             <td><span class="mobileShow">Email :</span> {{ $user->email }}</td>
-                            <td><span class="mobileShow">Houses :</span> {{ $user->house_count ?? 0 }}</td>
-                            <td><span class="mobileShow">Shops :</span> {{ $user->shop_count ?? 0 }}</td>
                             <td><span class="mobileShow">Roles :</span> 
                             @if(!empty($user->getRoleNames()))
                                 @foreach($user->getRoleNames() as $v)
